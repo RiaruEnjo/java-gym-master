@@ -14,31 +14,23 @@ public class Timetable {
                 .add(trainingSession);
     }
 
-    public List<TrainingSession> getTrainingSessionsForDay(DayOfWeek dayOfWeek) {
+    public TreeMap<TimeOfDay, List<TrainingSession>> getTrainingSessionsForDay(DayOfWeek dayOfWeek) {
         TreeMap<TimeOfDay, List<TrainingSession>> daySessions = timetable.get(dayOfWeek);
-        if (daySessions == null) {
-            return new ArrayList<>();
-        }
-        List<TrainingSession> result = new ArrayList<>();
-        for (List<TrainingSession> sessions : daySessions.values()) {
-            result.addAll(sessions);
-        }
-        return result;
+        return daySessions != null ? daySessions : new TreeMap<>();
     }
 
     public List<TrainingSession> getTrainingSessionsForDayAndTime(DayOfWeek dayOfWeek, TimeOfDay timeOfDay) {
         TreeMap<TimeOfDay, List<TrainingSession>> daySessions = timetable.get(dayOfWeek);
         if (daySessions == null) {
-            return new ArrayList<>();
+            return Collections.emptyList();
         }
-        List<TrainingSession> sessions = daySessions.get(timeOfDay);
-        return sessions != null ? new ArrayList<>(sessions) : new ArrayList<>();
+        return daySessions.getOrDefault(timeOfDay, Collections.emptyList());
     }
 
     public List<CoachTrainingCount> getCountByCoaches() {
         Map<Coach, Integer> coachCounts = new HashMap<>();
-        for (Map.Entry<DayOfWeek, TreeMap<TimeOfDay, List<TrainingSession>>> dayEntry : timetable.entrySet()) {
-            for (List<TrainingSession> sessions : dayEntry.getValue().values()) {
+        for (TreeMap<TimeOfDay, List<TrainingSession>> trainingsForDay : timetable.values()) {
+            for (List<TrainingSession> sessions : trainingsForDay.values()) {
                 for (TrainingSession session : sessions) {
                     Coach coach = session.getCoach();
                     coachCounts.put(coach, coachCounts.getOrDefault(coach, 0) + 1);
@@ -51,25 +43,7 @@ public class Timetable {
             counts.add(new CoachTrainingCount(entry.getKey(), entry.getValue()));
         }
 
-        counts.sort((a, b) -> Integer.compare(b.count, a.count));
+        counts.sort(null);
         return counts;
-    }
-
-    public static class CoachTrainingCount {
-        private final Coach coach;
-        private final int count;
-
-        public CoachTrainingCount(Coach coach, int count) {
-            this.coach = coach;
-            this.count = count;
-        }
-
-        public Coach getCoach() {
-            return coach;
-        }
-
-        public int getCount() {
-            return count;
-        }
     }
 }
