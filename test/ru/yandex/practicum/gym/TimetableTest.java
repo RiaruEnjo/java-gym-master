@@ -1,8 +1,9 @@
 package ru.yandex.practicum.gym;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import java.util.List;
+import java.util.TreeMap;
+
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -16,8 +17,11 @@ public class TimetableTest {
         TrainingSession session = new TrainingSession(group, coach, DayOfWeek.MONDAY, new TimeOfDay(13, 0));
         timetable.addNewTrainingSession(session);
 
-        assertEquals(1, timetable.getTrainingSessionsForDay(DayOfWeek.MONDAY).size());
-        assertEquals(0, timetable.getTrainingSessionsForDay(DayOfWeek.TUESDAY).size());
+        TreeMap<TimeOfDay, List<TrainingSession>> mondaySessions = timetable.getTrainingSessionsForDay(DayOfWeek.MONDAY);
+        assertEquals(1, mondaySessions.size());
+
+        TreeMap<TimeOfDay, List<TrainingSession>> tuesdaySessions = timetable.getTrainingSessionsForDay(DayOfWeek.TUESDAY);
+        assertEquals(0, tuesdaySessions.size());
     }
 
     @Test
@@ -36,15 +40,18 @@ public class TimetableTest {
         timetable.addNewTrainingSession(thursdayChild);
         timetable.addNewTrainingSession(saturdayChild);
 
-        List<TrainingSession> mondaySessions = timetable.getTrainingSessionsForDay(DayOfWeek.MONDAY);
+        TreeMap<TimeOfDay, List<TrainingSession>> mondaySessions = timetable.getTrainingSessionsForDay(DayOfWeek.MONDAY);
         assertEquals(1, mondaySessions.size());
 
-        List<TrainingSession> thursdaySessions = timetable.getTrainingSessionsForDay(DayOfWeek.THURSDAY);
+        TreeMap<TimeOfDay, List<TrainingSession>> thursdaySessions = timetable.getTrainingSessionsForDay(DayOfWeek.THURSDAY);
         assertEquals(2, thursdaySessions.size());
-        assertEquals(13, thursdaySessions.get(0).getTimeOfDay().getHours());
-        assertEquals(20, thursdaySessions.get(1).getTimeOfDay().getHours());
+        assertEquals(13, thursdaySessions.get(new TimeOfDay(13, 0)).get(0).getTimeOfDay().getHours());
+        assertEquals(20, thursdaySessions.get(new TimeOfDay(20, 0)).get(0).getTimeOfDay().getHours());
 
-        assertEquals(0, timetable.getTrainingSessionsForDay(DayOfWeek.TUESDAY).size());
+
+        TreeMap<TimeOfDay, List<TrainingSession>> tuesdaySessions = timetable.getTrainingSessionsForDay(DayOfWeek.TUESDAY);
+        assertEquals(0, tuesdaySessions.size());
+
     }
 
     @Test
@@ -62,7 +69,8 @@ public class TimetableTest {
     @Test
     void testEmptyTimetable() {
         Timetable timetable = new Timetable();
-        assertEquals(0, timetable.getTrainingSessionsForDay(DayOfWeek.MONDAY).size());
+        TreeMap<TimeOfDay, List<TrainingSession>> sessions = timetable.getTrainingSessionsForDay(DayOfWeek.MONDAY);
+        assertEquals(0, sessions.size());
     }
 
     @Test
@@ -77,7 +85,8 @@ public class TimetableTest {
         timetable.addNewTrainingSession(session2);
 
         assertEquals(2, timetable.getTrainingSessionsForDayAndTime(DayOfWeek.MONDAY, new TimeOfDay(10, 0)).size());
-        assertEquals(2, timetable.getTrainingSessionsForDay(DayOfWeek.MONDAY).size());
+        TreeMap<TimeOfDay, List<TrainingSession>> mondaySessions = timetable.getTrainingSessionsForDay(DayOfWeek.MONDAY);
+        assertEquals(1, mondaySessions.size()); // 1 временной слот
     }
 
     @Test
