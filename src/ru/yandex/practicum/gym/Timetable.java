@@ -14,16 +14,9 @@ public class Timetable {
                 .add(trainingSession);
     }
 
-    public List<TrainingSession> getTrainingSessionsForDay(DayOfWeek dayOfWeek) {
+    public TreeMap<TimeOfDay, List<TrainingSession>> getTrainingSessionsForDay(DayOfWeek dayOfWeek) {
         TreeMap<TimeOfDay, List<TrainingSession>> daySessions = timetable.get(dayOfWeek);
-        if (daySessions == null) {
-            return new ArrayList<>();
-        }
-        List<TrainingSession> result = new ArrayList<>();
-        for (List<TrainingSession> sessions : daySessions.values()) {
-            result.addAll(sessions);
-        }
-        return result;
+        return daySessions != null ? daySessions : new TreeMap<>();
     }
 
     public List<TrainingSession> getTrainingSessionsForDayAndTime(DayOfWeek dayOfWeek, TimeOfDay timeOfDay) {
